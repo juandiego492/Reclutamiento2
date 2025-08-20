@@ -49,14 +49,26 @@ export default function HomePage() {
     email: "",
     phone: "",
     position: "",
-    cv: null,
+    cv: null as File | null,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, files } = e.target;
+    // La clave es no desestructurar 'files' directamente de e.target
+    const target = e.target;
+    const { name, value } = target;
+    let newValue;
+
+    if (target.type === 'file') {
+      // TypeScript sabe que si el tipo es 'file', entonces 'target' es un HTMLInputElement
+      newValue = (target as HTMLInputElement).files?.[0] || null;
+    } else {
+      // En cualquier otro caso, usa el valor normal
+      newValue = value;
+    }
+
     setFormData({
       ...formData,
-      [name]: files ? files[0] : value,
+      [name]: newValue,
     });
   };
 

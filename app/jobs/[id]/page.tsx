@@ -1,267 +1,237 @@
-// Código corregido para la página principal (app/page.tsx)
+// Código corregido para app/jobs/[id]/page.tsx
 "use client";
 
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
-import Image from "next/image";
-import React from 'react'; // Importa React para los tipos de eventos
+import styles from "./JobPage.module.css";
+import React from 'react';
 
-// Importa las imágenes desde la carpeta /public
-import logo from '/public/logo.jpg';
-import hr from '/public/hr.jpg';
+interface Job {
+  title: string;
+  description: string;
+  responsibilities: string[];
+  requirements: string[];
+  benefits: string[];
+}
 
-const jobs = [
-  {
-    id: "data-engineer",
-    title: "Data Analyst & Engineer",
-    description: "Versátil profesional que construye pipelines y transforma datos en decisiones estratégicas.",
-  },
-  {
-    id: "sales-marketing-specialist",
-    title: "Sales & Marketing Specialist (Female)",
-    description: "Profesional dinámica en ventas y marketing, bilingüe y creativa para campañas exitosas.",
-  },
-  {
-    id: "website-specialist",
-    title: "Website Specialist",
-    description: "Experta en plataformas de cursos, funnels y CRM para optimizar la experiencia del usuario.",
-  },
-  {
-    id: "solution-integration-specialist",
-    title: "Solution Integrations Specialist",
-    description: "Especialista en integración de soluciones TI, documentación y soporte técnico de proyectos.",
-  },
-  {
-    id: "digital-advertising-specialist",
-    title: "Digital Advertising Specialist",
-    description: "Gestiona y optimiza campañas digitales con análisis de datos y estrategia de ROI.",
-  },
-  {
-    id: "system-administrator",
-    title: "System Administrator",
-    description: "Encargado de mantener la infraestructura TI, seguridad y soporte técnico profesional.",
-  },
-];
+const jobsData: Record<string, Job> = {
+  "data-engineer": {
+    title: "Data Analyst & Engineer",
+    description:
+      "Únete a nuestro equipo de datos y transforma información en decisiones estratégicas.",
+    responsibilities: [
+      "Diseñar y mantener pipelines ETL/ELT.",
+      "Construir infraestructura de datos (cloud data warehouse, data lake).",
+      "Implementar controles de calidad y monitoreo de datos.",
+      "Analizar datos para decisiones de negocio y métricas clave.",
+      "Crear dashboards y reportes para toda la empresa.",
+    ],
+    requirements: [
+      "3+ años de experiencia en roles de datos.",
+      "SQL avanzado, Python y cloud platforms (AWS/GCP/Azure).",
+      "Experiencia en BI tools (Tableau, Power BI, Looker).",
+      "Comunicación efectiva entre técnico y negocio.",
+    ],
+    benefits: ["Crecimiento profesional", "Proyectos desafiantes", "Ambiente dinámico"],
+  },
+  "sales-marketing-specialist": {
+    title: "Sales and Marketing Specialist (Female)",
+    description:
+      "Participa en nuestras campañas y gestión de clientes, aportando creatividad y estrategia.",
+    responsibilities: [
+      "Gestionar comunicación inbound y outbound.",
+      "Redacción de contenido para blogs y campañas.",
+      "Administrar CRM y seguimientos en Monday.com.",
+      "Creación de contenidos visuales en Canva.",
+      "Apoyar campañas y distribución de contenido digital.",
+    ],
+    requirements: [
+      "Fluidez en inglés y español (nivel nativo).",
+      "Habilidades de comunicación y escritura excelentes.",
+      "Experiencia en CRM y herramientas de marketing.",
+      "Creatividad y capacidad de aprendizaje rápido.",
+    ],
+    benefits: ["Trabajo remoto", "Aprendizaje continuo", "Cultura de equipo positiva"],
+  },
+  "website-specialist": {
+    title: "Website Specialist",
+    description:
+      "Apoya la configuración y optimización de cursos y membresías en plataformas digitales.",
+    responsibilities: [
+      "Subir y organizar cursos en System.io",
+      "Configurar funnels de marketing y CRM",
+      "Desarrollar sitios de membresía con acceso por niveles",
+      "Organizar librerías de video",
+      "Asesorar en integraciones y mejoras de plataforma",
+    ],
+    requirements: [
+      "Experiencia con System.io, Podia o plataformas similares",
+      "Conocimiento de CRM y marketing funnels",
+      "Capacidad de gestión de contenido digital",
+      "Organización y atención al detalle",
+    ],
+    benefits: ["Trabajo remoto", "Aprendizaje técnico", "Crecimiento profesional"],
+  },
+  "solution-integration-specialist": {
+    title: "Solution Integrations Specialist",
+    description: "Implementa soluciones técnicas y gestiona proyectos de infraestructura IT.",
+    responsibilities: [
+      "Contacto técnico principal para implementación de proyectos",
+      "Documentación técnica y diagramas de red",
+      "Configuración y mantenimiento de soluciones según especificaciones",
+      "Entrenamiento de equipos internos",
+      "Monitoreo y ajuste de proyectos para éxito",
+    ],
+    requirements: [
+      "5+ años de experiencia en infraestructura IT",
+      "Certificaciones Microsoft 365, AZ-104, AZ-800/801, Fortinet",
+      "Bilingüe inglés-francés",
+      "Título técnico en IT o ingeniería",
+    ],
+    benefits: ["Desarrollo profesional", "Salario competitivo", "Exposición a proyectos avanzados"],
+  },
+  "digital-advertising-specialist": {
+    title: "Digital Advertising Specialist",
+    description: "Gestiona y optimiza campañas digitales en diversas plataformas publicitarias.",
+    responsibilities: [
+      "Crear y optimizar campañas en Google, Meta, YouTube y LinkedIn",
+      "Analizar métricas y generar reportes de rendimiento",
+      "Optimizar segmentación, testing A/B y estrategias de puja",
+      "Apoyo en desarrollo web y optimización de clientes",
+    ],
+    requirements: [
+      "3+ años de experiencia en campañas digitales",
+      "Manejo de plataformas publicitarias y herramientas analíticas",
+      "Inglés fluido",
+      "Conocimiento en Excel y software de reporting",
+    ],
+    benefits: ["Trabajo remoto", "Crecimiento en marketing digital", "Aprendizaje de nuevas plataformas"],
+  },
+  "system-administrator": {
+    title: "System Administrator",
+    description: "Mantén y optimiza nuestra infraestructura IT, asegurando seguridad y soporte técnico.",
+    responsibilities: [
+      "Monitorear hardware, servidores y procesos",
+      "Instalar, configurar y actualizar sistemas operativos y aplicaciones",
+      "Gestionar redes, firewalls y VPNs",
+      "Implementar medidas de seguridad y políticas IT",
+      "Gestionar backups y recuperación de desastres",
+      "Soporte técnico a usuarios",
+      "Mantener documentación de sistemas",
+      "Aplicar parches y actualizaciones",
+      "Planificación de capacidad y rendimiento",
+      "Colaborar con equipo de IT y seguridad",
+    ],
+    requirements: [
+      "8+ años de experiencia en infraestructura IT",
+      "Certificaciones Microsoft 365, AZ-800/801, AZ-104, Fortinet",
+      "Experiencia en Linux, Windows Server, MS SQL, PowerShell/Bash",
+      "Inglés y francés fluido",
+      "Título técnico en Ciencias de la Computación o afín",
+    ],
+    benefits: ["Crecimiento profesional", "Salario atractivo", "Trabajo con expertos del sector IT"],
+  },
+};
 
-export default function HomePage() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    position: "",
-    cv: null as File | null,
-  });
+export default function JobPage() {
+  const params = useParams();
+  const jobId = Array.isArray(params.id) ? params.id[0] : params.id;
+  const job = jobId ? jobsData[jobId] : undefined;
 
-  // Función handleChange con tipado y lógica correctos
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    let newValue;
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    cv: null as File | null,
+  });
 
-    // Usa un "type guard" para verificar si el input tiene la propiedad `files`.
-    if ('files' in e.target) {
-      newValue = e.target.files?.[0] || null;
-    } else {
-      newValue = value;
-    }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, files } = e.target;
+    setFormData({
+      ...formData,
+      [name]: files ? files[0] : value,
+    });
+  };
 
-    setFormData({
-      ...formData,
-      [name]: newValue,
-    });
-  };
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    alert("✅ Tu aplicación ha sido enviada con éxito!");
+  };
 
-  // Función handleSubmit con tipado correcto
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    alert("✅ Tu aplicación ha sido enviada con éxito!");
-    setFormData({ name: "", email: "", phone: "", position: "", cv: null });
-  };
+  if (!job) {
+    return (
+      <div className={styles.notFound}>
+        <h1>Puesto no encontrado</h1>
+        <Link href="/">
+          <button>Volver al Inicio</button>
+        </Link>
+      </div>
+    );
+  }
 
-  return (
-    <div style={{ fontFamily: "Arial, sans-serif", color: "#1F2937", lineHeight: 1.6 }}>
-      {/* Hero Section */}
-      <section
-        style={{
-          position: "relative",
-          textAlign: "center",
-          padding: "6rem 1rem",
-          overflow: "hidden",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "400px",
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            zIndex: -1,
-            backgroundImage: `url(${hr.src})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            opacity: 0.25,
-            filter: 'grayscale(100%)',
-          }}
-        />
-        {/* Color de texto cambiado a negro */}
-        <h1 style={{ fontSize: "3rem", marginBottom: "1rem", color: "#1F2937" }}>Únete a Nuestro Equipo</h1>
-        <p style={{ fontSize: "1.25rem", marginBottom: "2rem", color: "#1F2937" }}>Construye tu futuro con nosotros 🚀</p>
-        <Link href="#jobs">
-          <button
-            style={{
-              padding: "0.8rem 2rem",
-              fontSize: "1rem",
-              borderRadius: "12px",
-              background: "blue",
-              color: "#ffffffff",
-              fontWeight: "bold",
-              cursor: "pointer",
-              border: "none",
-              transition: "all 0.2s",
-            }}
-          >
-            Ver Vacantes
-          </button>
-        </Link>
-      </section>
+  return (
+    <div className={styles.container}>
+      <section className={styles.hero}>
+        <h1>{job.title}</h1>
+        <p>{job.description}</p>
+      </section>
 
-      {/* Jobs Section */}
-      <section id="jobs" style={{ maxWidth: "900px", margin: "4rem auto", padding: "0 1rem" }}>
-        <h2 style={{ fontSize: "2rem", marginBottom: "2rem", textAlign: "center" }}>Vacantes Disponibles</h2>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-            gap: "1.5rem",
-            alignItems: "stretch", // Esto es lo que soluciona la alineación
-          }}
-        >
-          {jobs.map((job) => (
-            <Link key={job.id} href={`/jobs/${job.id}`} style={{ textDecoration: "none" }}>
-              <div
-                style={{
-                  border: "1px solid #1F2937",
-                  borderRadius: "16px",
-                  padding: "1.5rem",
-                  background: "white",
-                  boxShadow: "0 4px 8px rgba(0,0,0,0.05)",
-                  transition: "all 0.3s",
-                  cursor: "pointer",
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget).style.transform = "translateY(-5px)";
-                  (e.currentTarget).style.boxShadow = "0 8px 16px rgba(0,0,0,0.15)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget).style.transform = "translateY(0)";
-                  (e.currentTarget).style.boxShadow = "0 4px 8px rgba(0,0,0,0.05)";
-                }}
-              >
-                <div>
-                  <h3 style={{ fontSize: "1.25rem", fontWeight: "bold", marginBottom: "0.5rem", color: "#1F2937" }}>{job.title}</h3>
-                  <p style={{ marginBottom: "1rem", color: "#4B5563", fontSize: "0.95rem" }}>{job.description}</p>
-                </div>
-                <button
-                  style={{
-                    padding: "0.6rem 1.2rem",
-                    borderRadius: "12px",
-                    background: "#4F46E5",
-                    color: "white",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                    border: "none",
-                    alignSelf: "flex-start",
-                  }}
-                >
-                  Ver Puesto
-                </button>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
+      <section className={styles.quickInfo}>
+        <div>
+          Tipo de trabajo: <span style={{ fontWeight: "normal" }}>Tiempo completo</span>
+        </div>
+        <div>
+          Ubicación: <span style={{ fontWeight: "normal" }}>Remoto</span>
+        </div>
+        <Link href="#apply">
+          <button>Aplica Ahora</button>
+        </Link>
+      </section>
 
-      {/* Apply Now Form */}
-      <section style={{ maxWidth: "600px", margin: "4rem auto", padding: "2rem", background: "#F3F4F6", borderRadius: "16px" }}>
-        <h2 style={{ fontSize: "2rem", marginBottom: "1.5rem", textAlign: "center" }}>Aplica Ahora</h2>
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <input
-            type="text"
-            name="name"
-            placeholder="Nombre Completo"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            style={{ padding: "0.8rem", borderRadius: "12px", border: "1px solid #D1D5DB" }}
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Correo Electrónico"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            style={{ padding: "0.8rem", borderRadius: "12px", border: "1px solid #D1D5DB" }}
-          />
-          <input
-            type="tel"
-            name="phone"
-            placeholder="Teléfono"
-            value={formData.phone}
-            onChange={handleChange}
-            required
-            style={{ padding: "0.8rem", borderRadius: "12px", border: "1px solid #D1D5DB" }}
-          />
-          <select
-            name="position"
-            value={formData.position}
-            onChange={handleChange}
-            required
-            style={{ padding: "0.8rem", borderRadius: "12px", border: "1px solid #D1D5DB" }}
-          >
-            <option value="">Selecciona el puesto</option>
-            {jobs.map((job) => (
-              <option key={job.id} value={job.title}>{job.title}</option>
-            ))}
-          </select>
-          <input
-            type="file"
-            name="cv"
-            onChange={handleChange}
-            style={{ padding: "0.8rem", borderRadius: "12px", border: "1px solid #D1D5DB" }}
-          />
-          <button
-            type="submit"
-            style={{
-              padding: "0.8rem",
-              borderRadius: "12px",
-              background: "#4F46E5",
-              color: "white",
-              fontWeight: "bold",
-              cursor: "pointer",
-              border: "none",
-              marginTop: "0.5rem",
-            }}
-          >
-            Enviar Aplicación
-          </button>
-        </form>
-      </section>
+      <section className={styles.cards}>
+        <div className={styles.card}>
+          <h2>Responsabilidades</h2>
+          <ul>
+            {job.responsibilities.map((resp, idx) => (
+              <li key={idx}>{resp}</li>
+            ))}
+          </ul>
+        </div>
+        <div className={styles.card}>
+          <h2>Requisitos</h2>
+          <ul>
+            {job.requirements.map((req, idx) => (
+              <li key={idx}>{req}</li>
+            ))}
+          </ul>
+        </div>
+        <div className={styles.card}>
+          <h2>Beneficios</h2>
+          <ul>
+            {job.benefits.map((ben, idx) => (
+              <li key={idx}>{ben}</li>
+            ))}
+          </ul>
+        </div>
+      </section>
 
-      {/* Footer */}
-      <footer style={{ textAlign: "center", padding: "2rem 1rem", background: "#1F2937", color: "white", display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-        <Image src={logo} alt="IronVoice Solutions Logo" width={100} height={100} />
-        <p>© {new Date().getFullYear()} IronVoice Solutions. Todos los derechos reservados.</p>
-      </footer>
-    </div>
-  );
+      <section id="apply">
+        <h2 style={{ textAlign: "center", marginBottom: "1rem" }}>Aplica Ahora</h2>
+        <form className={styles.form} onSubmit={handleSubmit}>
+          <input type="text" name="name" placeholder="Nombre Completo" onChange={handleChange} required />
+          <input type="email" name="email" placeholder="Correo Electrónico" onChange={handleChange} required />
+          <input type="tel" name="phone" placeholder="Teléfono" onChange={handleChange} required />
+          <input type="file" name="cv" onChange={handleChange} />
+          <button type="submit">Enviar Aplicación</button>
+        </form>
+      </section>
+
+      <div className={styles.centerButton}>
+        <Link href="/">
+          <button>Volver al Inicio</button>
+        </Link>
+      </div>
+    </div>
+  );
 }
