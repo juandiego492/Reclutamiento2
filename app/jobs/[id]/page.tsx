@@ -49,15 +49,24 @@ export default function HomePage() {
     email: "",
     phone: "",
     position: "",
-    cv: null,
+    cv: null as File | null, // Asigna un tipo explícito a 'cv'
   });
 
-  // Función handleChange con tipado correcto
+  // Función handleChange con tipado y lógica correctos
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, files } = e.target;
+    const { name, value } = e.target;
+    let newValue;
+
+    // Type guard para manejar input de tipo 'file'
+    if (e.target.type === 'file') {
+      newValue = (e.target as HTMLInputElement).files?.[0] || null;
+    } else {
+      newValue = value;
+    }
+
     setFormData({
       ...formData,
-      [name]: files ? files[0] : value,
+      [name]: newValue,
     });
   };
 
