@@ -1,4 +1,4 @@
-// Código corregido para la página principal (app/page.tsx)
+// app/page.tsx
 "use client";
 
 import Link from "next/link";
@@ -17,6 +17,7 @@ const jobs = [
     description: "Versátil profesional que construye pipelines y transforma datos en decisiones estratégicas.",
   },
   {
+    id: "sales-marketing-specialist",
     id: "sales-marketing-specialist",
     title: "Sales & Marketing Specialist (Female)",
     description: "Profesional dinámica en ventas y marketing, bilingüe y creativa para campañas exitosas.",
@@ -88,15 +89,16 @@ export default function HomePage() {
         body: dataToSend,
       });
 
-      if (response.ok) {
+      if (response.status === 200) {
         alert("✅ Tu aplicación ha sido enviada con éxito!");
         setFormData({ name: "", email: "", phone: "", position: "", cv: null });
       } else {
-        alert("❌ Error al enviar la aplicación. Inténtalo de nuevo.");
+        const errorData = await response.json();
+        alert(`❌ Error al enviar la aplicación: ${errorData.message}`);
       }
     } catch (error) {
       console.error("Error en la solicitud:", error);
-      alert("❌ Error al enviar la aplicación. Por favor, revisa la consola para más detalles.");
+      alert("❌ Error de red: No se pudo conectar con el servidor.");
     }
   };
 
