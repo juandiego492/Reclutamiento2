@@ -5,10 +5,19 @@ import Link from "next/link";
 import { useState } from "react";
 import styles from "./JobPage.module.css"; // Importa tu CSS como módulo
 
-const jobsData: { [key: string]: any } = {
+interface Job {
+  title: string;
+  description: string;
+  responsibilities: string[];
+  requirements: string[];
+  benefits: string[];
+}
+
+const jobsData: Record<string, Job> = {
   "data-engineer": {
     title: "Data Analyst & Engineer",
-    description: "Únete a nuestro equipo de datos y transforma información en decisiones estratégicas.",
+    description:
+      "Únete a nuestro equipo de datos y transforma información en decisiones estratégicas.",
     responsibilities: [
       "Diseñar y mantener pipelines ETL/ELT.",
       "Construir infraestructura de datos (cloud data warehouse, data lake).",
@@ -26,7 +35,8 @@ const jobsData: { [key: string]: any } = {
   },
   "sales-marketing-specialist": {
     title: "Sales and Marketing Specialist (Female)",
-    description: "Participa en nuestras campañas y gestión de clientes, aportando creatividad y estrategia.",
+    description:
+      "Participa en nuestras campañas y gestión de clientes, aportando creatividad y estrategia.",
     responsibilities: [
       "Gestionar comunicación inbound y outbound.",
       "Redacción de contenido para blogs y campañas.",
@@ -44,7 +54,8 @@ const jobsData: { [key: string]: any } = {
   },
   "website-specialist": {
     title: "Website Specialist",
-    description: "Apoya la configuración y optimización de cursos y membresías en plataformas digitales.",
+    description:
+      "Apoya la configuración y optimización de cursos y membresías en plataformas digitales.",
     responsibilities: [
       "Subir y organizar cursos en System.io",
       "Configurar funnels de marketing y CRM",
@@ -123,14 +134,14 @@ const jobsData: { [key: string]: any } = {
 
 export default function JobPage() {
   const params = useParams();
-  const jobId = params.id;
-  const job = jobsData[jobId];
+  const jobId = Array.isArray(params.id) ? params.id[0] : params.id; // <-- corregido
+  const job = jobId ? jobsData[jobId] : undefined;
 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
-    cv: null,
+    cv: null as File | null, // <-- tipado correcto
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -159,13 +170,11 @@ export default function JobPage() {
 
   return (
     <div className={styles.container}>
-      {/* Hero / Header */}
       <section className={styles.hero}>
         <h1>{job.title}</h1>
         <p>{job.description}</p>
       </section>
 
-      {/* Quick Info + Apply Button */}
       <section className={styles.quickInfo}>
         <div>
           Tipo de trabajo: <span style={{ fontWeight: "normal" }}>Tiempo completo</span>
@@ -178,12 +187,11 @@ export default function JobPage() {
         </Link>
       </section>
 
-      {/* Responsibilities, Requirements, Benefits */}
       <section className={styles.cards}>
         <div className={styles.card}>
           <h2>Responsabilidades</h2>
           <ul>
-            {job.responsibilities.map((resp: string, idx: number) => (
+            {job.responsibilities.map((resp, idx) => (
               <li key={idx}>{resp}</li>
             ))}
           </ul>
@@ -191,7 +199,7 @@ export default function JobPage() {
         <div className={styles.card}>
           <h2>Requisitos</h2>
           <ul>
-            {job.requirements.map((req: string, idx: number) => (
+            {job.requirements.map((req, idx) => (
               <li key={idx}>{req}</li>
             ))}
           </ul>
@@ -199,14 +207,13 @@ export default function JobPage() {
         <div className={styles.card}>
           <h2>Beneficios</h2>
           <ul>
-            {job.benefits.map((ben: string, idx: number) => (
+            {job.benefits.map((ben, idx) => (
               <li key={idx}>{ben}</li>
             ))}
           </ul>
         </div>
       </section>
 
-      {/* Application Form */}
       <section id="apply">
         <h2 style={{ textAlign: "center", marginBottom: "1rem" }}>Aplica Ahora</h2>
         <form className={styles.form} onSubmit={handleSubmit}>
