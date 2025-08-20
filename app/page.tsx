@@ -1,11 +1,12 @@
-// Código con la sección Hero modificada para que el texto sea negro.
-
+// Código corregido para la página principal (app/page.tsx)
 "use client";
 
 import Link from "next/link";
 import { useState } from "react";
 import Image from "next/image";
+import React from 'react';
 
+// Importa las imágenes desde la carpeta /public
 import logo from '/public/logo.jpg';
 import hr from '/public/hr.jpg';
 
@@ -51,7 +52,7 @@ export default function HomePage() {
     cv: null,
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, files } = e.target;
     setFormData({
       ...formData,
@@ -59,7 +60,7 @@ export default function HomePage() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     alert("✅ Tu aplicación ha sido enviada con éxito!");
     setFormData({ name: "", email: "", phone: "", position: "", cv: null });
@@ -96,7 +97,6 @@ export default function HomePage() {
             filter: 'grayscale(100%)',
           }}
         />
-        {/* Color de texto cambiado a negro */}
         <h1 style={{ fontSize: "3rem", marginBottom: "1rem", color: "#1F2937" }}>Únete a Nuestro Equipo</h1>
         <p style={{ fontSize: "1.25rem", marginBottom: "2rem", color: "#1F2937" }}>Construye tu futuro con nosotros 🚀</p>
         <Link href="#jobs">
@@ -126,7 +126,7 @@ export default function HomePage() {
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
             gap: "1.5rem",
-            alignItems: "stretch", // Esto es lo que soluciona la alineación
+            alignItems: "stretch",
           }}
         >
           {jobs.map((job) => (
