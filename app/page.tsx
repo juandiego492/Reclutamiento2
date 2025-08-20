@@ -1,7 +1,13 @@
+// Código con la sección Hero modificada para que el texto sea negro.
+
 "use client";
 
 import Link from "next/link";
 import { useState } from "react";
+import Image from "next/image";
+
+import logo from '/public/logo.jpg';
+import hr from '/public/hr.jpg';
 
 const jobs = [
   {
@@ -45,15 +51,15 @@ export default function HomePage() {
     cv: null,
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, files } = e.target as any;
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
     setFormData({
       ...formData,
       [name]: files ? files[0] : value,
     });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     alert("✅ Tu aplicación ha sido enviada con éxito!");
     setFormData({ name: "", email: "", phone: "", position: "", cv: null });
@@ -64,22 +70,43 @@ export default function HomePage() {
       {/* Hero Section */}
       <section
         style={{
-          background: "linear-gradient(to right, #4F46E5, #6366F1)",
-          color: "white",
+          position: "relative",
           textAlign: "center",
-          padding: "4rem 1rem",
+          padding: "6rem 1rem",
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "400px",
         }}
       >
-        <h1 style={{ fontSize: "3rem", marginBottom: "1rem" }}>Únete a Nuestro Equipo</h1>
-        <p style={{ fontSize: "1.25rem", marginBottom: "2rem" }}>Construye tu futuro con nosotros 🚀</p>
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            zIndex: -1,
+            backgroundImage: `url(${hr.src})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            opacity: 0.25,
+            filter: 'grayscale(100%)',
+          }}
+        />
+        {/* Color de texto cambiado a negro */}
+        <h1 style={{ fontSize: "3rem", marginBottom: "1rem", color: "#1F2937" }}>Únete a Nuestro Equipo</h1>
+        <p style={{ fontSize: "1.25rem", marginBottom: "2rem", color: "#1F2937" }}>Construye tu futuro con nosotros 🚀</p>
         <Link href="#jobs">
           <button
             style={{
               padding: "0.8rem 2rem",
               fontSize: "1rem",
               borderRadius: "12px",
-              background: "white",
-              color: "#4F46E5",
+              background: "blue",
+              color: "#ffffffff",
               fontWeight: "bold",
               cursor: "pointer",
               border: "none",
@@ -99,13 +126,14 @@ export default function HomePage() {
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
             gap: "1.5rem",
+            alignItems: "stretch", // Esto es lo que soluciona la alineación
           }}
         >
           {jobs.map((job) => (
             <Link key={job.id} href={`/jobs/${job.id}`} style={{ textDecoration: "none" }}>
               <div
                 style={{
-                  border: "1px solid #E5E7EB",
+                  border: "1px solid #1F2937",
                   borderRadius: "16px",
                   padding: "1.5rem",
                   background: "white",
@@ -118,12 +146,12 @@ export default function HomePage() {
                   justifyContent: "space-between",
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.transform = "translateY(-5px)";
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = "0 8px 16px rgba(0,0,0,0.15)";
+                  (e.currentTarget).style.transform = "translateY(-5px)";
+                  (e.currentTarget).style.boxShadow = "0 8px 16px rgba(0,0,0,0.15)";
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = "0 4px 8px rgba(0,0,0,0.05)";
+                  (e.currentTarget).style.transform = "translateY(0)";
+                  (e.currentTarget).style.boxShadow = "0 4px 8px rgba(0,0,0,0.05)";
                 }}
               >
                 <div>
@@ -218,7 +246,8 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer style={{ textAlign: "center", padding: "2rem 1rem", background: "#1F2937", color: "white" }}>
+      <footer style={{ textAlign: "center", padding: "2rem 1rem", background: "#1F2937", color: "white", display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+        <Image src={logo} alt="IronVoice Solutions Logo" width={100} height={100} />
         <p>© {new Date().getFullYear()} IronVoice Solutions. Todos los derechos reservados.</p>
       </footer>
     </div>
