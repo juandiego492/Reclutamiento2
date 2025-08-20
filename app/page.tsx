@@ -53,16 +53,13 @@ export default function HomePage() {
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    // La clave es no desestructurar 'files' directamente de e.target
     const target = e.target;
     const { name, value } = target;
     let newValue;
 
-    if (target.type === 'file') {
-      // TypeScript sabe que si el tipo es 'file', entonces 'target' es un HTMLInputElement
+    if ('files' in target) {
       newValue = (target as HTMLInputElement).files?.[0] || null;
     } else {
-      // En cualquier otro caso, usa el valor normal
       newValue = value;
     }
 
@@ -72,10 +69,35 @@ export default function HomePage() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    alert("✅ Tu aplicación ha sido enviada con éxito!");
-    setFormData({ name: "", email: "", phone: "", position: "", cv: null });
+
+    const dataToSend = new FormData();
+    dataToSend.append('name', formData.name);
+    dataToSend.append('email', formData.email);
+    dataToSend.append('phone', formData.phone);
+    dataToSend.append('position', formData.position);
+    
+    if (formData.cv) {
+      dataToSend.append('cv', formData.cv);
+    }
+
+    try {
+      const response = await fetch('/api/submit-application', {
+        method: 'POST',
+        body: dataToSend,
+      });
+
+      if (response.ok) {
+        alert("✅ Tu aplicación ha sido enviada con éxito!");
+        setFormData({ name: "", email: "", phone: "", position: "", cv: null });
+      } else {
+        alert("❌ Error al enviar la aplicación. Inténtalo de nuevo.");
+      }
+    } catch (error) {
+      console.error("Error en la solicitud:", error);
+      alert("❌ Error al enviar la aplicación. Por favor, revisa la consola para más detalles.");
+    }
   };
 
   return (
